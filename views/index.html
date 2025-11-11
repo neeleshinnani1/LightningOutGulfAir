@@ -38,6 +38,7 @@
           "&redirect_uri=" +
           encodeURIComponent(redirectURI);
         popupCenter(url, "login", 700, 600);
+         console.log("OAuth URL:", url); 
       }
 
       function oauthCallback(response) {
