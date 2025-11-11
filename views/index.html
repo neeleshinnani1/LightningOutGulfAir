@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login to Salesforce (Sandbox)</title>
+    <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- jQuery Cookie plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+  </head>
+  <body style="font-family: sans-serif; padding: 40px">
+    <h1>Salesforce Lightning Out Demo</h1>
+    <p>This will log you into the Salesforce sandbox and then show the LWC.</p>
+    <button id="sandBtn">Login to Sandbox</button>
+
+    <script>
+      // ====== CONFIG ======
+      var apiVersion = "v61.0";
+      var clientId =
+        "3MVG9c81CnRMt6cI78EKt_GhP9ob6_JiUl7KtOhlZRcQGP45ZXjDZHIlPvaVKKku6Ns2MNmCjEO5aZdBk1B12";
+      // sandbox login
+      var loginUrl = "https://test.salesforce.com/";
+      // must match Connected App
+      var redirectURI = "https://localhost:8081/oauthcallback.html";
+
+      $("#sandBtn").click(function () {
+        login();
+      });
+
+      function login() {
+        var url =
+          loginUrl +
+          "services/oauth2/authorize?display=popup&response_type=token" +
+          "&client_id=" +
+          encodeURIComponent(clientId) +
+          "&redirect_uri=" +
+          encodeURIComponent(redirectURI);
+        popupCenter(url, "login", 700, 600);
+      }
+
+      function oauthCallback(response) {
+        if (response && response.access_token) {
+          console.log("OAuth success: ", response);
+          $.cookie("AccToken", response.access_token);
+          $.cookie("APIVer", apiVersion);
+          $.cookie("InstURL", response.instance_url);
+          $.cookie("idURL", response.id);
+
+          var parts = response.id.split("/");
+          $.cookie("LoggeduserId", parts[parts.length - 1]);
+
+          // go to main Lightning Out page
+          window.location = "Main.html"; // <-- direct file
+        } else {
+          alert("AuthenticationError: No Token");
+        }
+      }
+
+      function popupCenter(url, title, w, h) {
+        var parentLeft = window.screenLeft ? window.screenLeft : window.screenX;
+        var parentTop = window.screenTop ? window.screenTop : window.screenY;
+        var left = parentLeft + window.innerWidth / 2 - w / 2;
+        var top = parentTop + window.innerHeight / 2 - h / 2;
+        return window.open(
+          url,
+          title,
+          "width=" +
+            w +
+            ", height=" +
+            h +
+            ", top=" +
+            top +
+            ", left=" +
+            left
+        );
+      }
+
+      // expose callback to popup
+      window.oauthCallback = oauthCallback;
+    </script>
+  </body>
+</html>

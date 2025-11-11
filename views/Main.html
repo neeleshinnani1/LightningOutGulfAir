@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Lightning Out – Feedback</title>
+  </head>
+  <body>
+    <div id="lexcontainer"></div>
+
+    <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- jQuery Cookie plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+
+    <!-- load lightning.out.js from your org -->
+    <script src="https://gulfair--dev.sandbox.lightning.force.com/lightning/lightning.out.js"></script>
+
+    <script>
+      var _lightningReady = false;
+
+      // check if we have a token from OAuth
+      const token = $.cookie("AccToken");
+      const instUrl = $.cookie("InstURL");
+
+      if (!token || !instUrl) {
+        alert("Login to Salesforce first!");
+        window.location = "index.html";
+      } else {
+        createFeedback();
+      }
+
+      function setupLightning(callback) {
+        var appName = "c:feedbackOut";
+
+        if (_lightningReady) {
+          if (typeof callback === "function") callback();
+        } else {
+          // turn https://...my.salesforce.com into https://...lightning.force.com
+          var url = instUrl.replace("my.salesforce", "lightning.force");
+
+          $Lightning.use(
+            appName,
+            function () {
+              _lightningReady = true;
+              if (typeof callback === "function") callback();
+            },
+            url,
+            token // 👈 4th param: OAuth token
+          );
+        }
+      }
+
+      function createFeedback() {
+        setupLightning(function () {
+          $Lightning.createComponent(
+            "c:feedbackCardGrid",
+            {},
+            "lexcontainer",
+            function (cmp) {
+              console.log("Feedback LWC loaded 🚀");
+            }
+          );
+        });
+      }
+    </script>
+  </body>
+</html>

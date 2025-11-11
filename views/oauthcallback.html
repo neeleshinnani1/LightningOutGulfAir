@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script>
+      // Salesforce will redirect here with #access_token=...&instance_url=...
+      if (window.location.hash) {
+        var message = decodeURIComponent(window.location.hash.substr(1));
+        var params = message.split("&");
+        var response = {};
+        params.forEach(function (param) {
+          var splitter = param.split("=");
+          response[splitter[0]] = splitter[1];
+        });
+
+        // call opener (index.html) function
+        if (window.opener && window.opener.oauthCallback) {
+          window.opener.oauthCallback(response);
+          window.close();
+        } else {
+          document.write("No opener to send token to.");
+        }
+      } else {
+        document.write("No token in URL.");
+      }
+    </script>
+  </body>
+</html>
